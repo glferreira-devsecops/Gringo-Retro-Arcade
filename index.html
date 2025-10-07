@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gringo's Retro Arcade</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #BB86FC;
@@ -22,8 +23,19 @@
       100% { background-position: 0% 50%; }
     }
 
-    body,
-    html {
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes glitch {
+      0% { text-shadow: 0.05em 0 0 var(--error-color), -0.05em -0.025em 0 var(--secondary-color), -0.025em 0.05em 0 var(--primary-color); }
+      15% { text-shadow: -0.05em -0.025em 0 var(--error-color), 0.025em 0.025em 0 var(--secondary-color), -0.05em -0.05em 0 var(--primary-color); }
+      50% { text-shadow: 0.025em 0.05em 0 var(--error-color), 0.05em 0 0 var(--secondary-color), 0 -0.05em 0 var(--primary-color); }
+      100% { text-shadow: -0.025em 0 0 var(--error-color), -0.025em -0.025em 0 var(--secondary-color), -0.025em -0.05em 0 var(--primary-color); }
+    }
+
+    body, html {
       height: 100%;
       margin: 0;
       padding: 0;
@@ -49,12 +61,27 @@
       border-radius: 24px;
     }
 
+    h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      color: var(--primary-color);
+      text-transform: uppercase;
+      margin-bottom: 30px;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 0 var(--surface-color), 6px 6px 0 rgba(0, 0, 0, 0.2);
+      text-align: center;
+      cursor: pointer;
+      animation: glitch 1s linear infinite paused;
+    }
+    h1:hover {
+        animation-play-state: running;
+    }
+
     #game-container {
       position: relative;
       width: 100%;
       height: 75vh;
       max-height: 800px;
-      background-color: var(--surface-color);
+      background-color: #000;
       border-radius: 20px 20px 0 0;
       display: flex;
       justify-content: center;
@@ -63,11 +90,28 @@
       border: 4px solid var(--primary-color);
       border-bottom: none;
     }
+    
+    #game-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 4px, 6px 100%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.3;
+    }
 
     #game {
       width: 100%;
       height: 100%;
       background-color: #000;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
     }
 
     #loader {
@@ -80,12 +124,6 @@
       animation: spin 1s linear infinite;
       z-index: 10;
     }
-    .hidden { display: none; }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
 
     #controls {
       width: 100%;
@@ -93,11 +131,11 @@
       background-color: var(--surface-color);
       border-radius: 0 0 20px 20px;
       border: 4px solid var(--primary-color);
-      border-top: none;
+      border-top: 2px solid var(--primary-color);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 15px;
     }
 
     .control-btn {
@@ -125,6 +163,7 @@
 
     .control-btn:disabled {
       background-color: #555;
+      color: #999;
       cursor: not-allowed;
       transform: translateY(0);
       box-shadow: none;
@@ -141,19 +180,12 @@
       text-align: center;
       height: 20px;
       transition: color 0.3s ease;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
     }
+    
+    .status-error { color: var(--error-color) !important; }
 
-    h1 {
-      font-size: clamp(1.5rem, 5vw, 2.5rem);
-      color: var(--primary-color);
-      text-transform: uppercase;
-      margin-bottom: 30px;
-      letter-spacing: 3px;
-      text-shadow: 3px 3px 0 var(--surface-color), 6px 6px 0 rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-
-    #rom-info, #core-select {
+    .overlay-ui {
       position: absolute;
       top: 20px;
       z-index: 5;
@@ -171,219 +203,354 @@
       color: var(--on-surface-color);
       border: 2px solid var(--primary-color);
       font-family: 'Press Start 2P', cursive;
+      background-color: var(--surface-color);
     }
 
-    #easter-egg-modal {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--primary-color);
-      color: var(--background-color);
-      padding: 15px 25px;
-      border-radius: 10px;
-      z-index: 100;
-      font-size: 16px;
-      opacity: 0;
-      transition: opacity 0.5s ease, top 0.5s ease;
+    /* Modal Styles */
+    #game-modal {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    #easter-egg-modal.show {
-      top: 50px;
-      opacity: 1;
+    #game-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .modal-content {
+        background-color: var(--surface-color);
+        padding: 30px;
+        border-radius: 15px;
+        border: 3px solid var(--primary-color);
+        width: 80%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .modal-header h2 {
+        margin: 0;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+    .close-btn {
+        font-size: 1.5rem;
+        color: var(--on-surface-color);
+        cursor: pointer;
+        border: none; background: none;
+    }
+    #game-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    #game-list li {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        border: 1px solid transparent;
+    }
+    #game-list li:hover {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        border-color: var(--secondary-color);
     }
 
-    .pixelated {
-      image-rendering: pixelated;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-    }
-
-    @keyframes glitch {
-      0% { text-shadow: 0.05em 0 0 var(--error-color), -0.05em -0.025em 0 var(--secondary-color), -0.025em 0.05em 0 var(--primary-color); }
-      15% { text-shadow: -0.05em -0.025em 0 var(--error-color), 0.025em 0.025em 0 var(--secondary-color), -0.05em -0.05em 0 var(--primary-color); }
-      50% { text-shadow: 0.025em 0.05em 0 var(--error-color), 0.05em 0 0 var(--secondary-color), 0 -0.05em 0 var(--primary-color); }
-      100% { text-shadow: -0.025em 0 0 var(--error-color), -0.025em -0.025em 0 var(--secondary-color), -0.025em -0.05em 0 var(--primary-color); }
-    }
-    h1:hover { animation: glitch 1s linear infinite; }
+    .hidden { display: none !important; }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <div id="main-container">
-    <h1>Gringo Retro Arcade</h1>
+    <h1>Gringo's Retro Arcade</h1>
     <div id="game-container">
       <div id="loader" class="hidden"></div>
-      <div id="game" class="pixelated"></div>
-      <div id="rom-info"></div>
-      <select id="core-select" title="Select a core">
-        <option value="nes">NES</option>
+      <div id="game"></div>
+      <div id="rom-info" class="overlay-ui"></div>
+      <select id="core-select" class="overlay-ui" title="Select a core">
         <option value="snes">SNES</option>
-        <option value="gb">Game Boy</option>
-        <option value="gbc">Game Boy Color</option>
+        <option value="nes">NES</option>
         <option value="gba">Game Boy Advance</option>
-        <option value="vb">Virtual Boy</option>
-        <option value="n64">Nintendo 64</option>
-        <option value="nds">Nintendo DS</option>
-        <option value="segaMS">Sega Master System</option>
         <option value="segaMD">Sega Mega Drive</option>
-        <option value="segaCD">Sega CD</option>
-        <option value="segaGG">Sega Game Gear</option>
-        <option value="sega32x">Sega 32X</option>
-        <option value="segaSaturn">Sega Saturn</option>
         <option value="psx">PlayStation</option>
-        <option value="atari2600">Atari 2600</option>
-        <option value="atari7800">Atari 7800</option>
-        <option value="lynx">Atari Lynx</option>
-        <option value="pce">PC Engine/TurboGrafx-16</option>
-        <option value="ws">WonderSwan</option>
-        <option value="ngp">Neo Geo Pocket</option>
       </select>
     </div>
     <div id="controls">
-      <button id="uploadLabel" class="control-btn">
-        <i class="fa-solid fa-upload"></i> Carregar ROM
+      <button id="selectGameBtn" class="control-btn">
+        <i class="fa-solid fa-gamepad"></i> Selecionar Jogo
       </button>
-       <button id="resetBtn" class="control-btn">
+      <button id="saveStateBtn" class="control-btn" disabled>
+        <i class="fa-solid fa-save"></i> Salvar
+      </button>
+       <button id="loadStateBtn" class="control-btn" disabled>
+        <i class="fa-solid fa-folder-open"></i> Carregar
+      </button>
+      <button id="resetBtn" class="control-btn" disabled>
         <i class="fa-solid fa-power-off"></i> Reiniciar
       </button>
       <button id="fullscreenBtn" class="control-btn">
         <i class="fa-solid fa-expand"></i> Tela Cheia
       </button>
     </div>
-    <div id="status">Selecione o console e carregue uma ROM para começar!</div>
+    <div id="status">Selecione um console e escolha um jogo para começar!</div>
   </div>
-  
-  <div id="easter-egg-modal">Código Konami Ativado!</div>
-  <input type="file" id="romUpload" style="display: none;">
+
+  <div id="game-modal">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h2 id="modal-title">Selecione um Jogo</h2>
+              <button class="close-btn" id="closeModalBtn">&times;</button>
+          </div>
+          <ul id="game-list">
+              </ul>
+      </div>
+  </div>
 
   <script>
-    // --- EmulatorJS Configuration ---
+    // --- Application State & Configuration ---
+    const APP_STATE = {
+        isGameRunning: false,
+        currentCore: 'snes',
+        currentGame: '',
+    };
+    
     window.EJS_player = "#game";
-    window.EJS_core = "nes";
     window.EJS_gameName = "Gringo Retro Arcade";
     window.EJS_color = "#BB86FC";
     window.EJS_startOnLoaded = true;
     window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
 
-    // --- DOM Elements ---
-    const getEl = (id) => document.getElementById(id);
-    const coreSelect = getEl('core-select');
-    const uploadLabel = getEl('uploadLabel');
-    const romUpload = getEl('romUpload');
-    const statusDiv = getEl('status');
-    const romInfoDiv = getEl('rom-info');
-    const fullscreenBtn = getEl('fullscreenBtn');
-    const resetBtn = getEl('resetBtn');
-    const gameContainer = getEl('game-container');
-    const loader = getEl('loader');
-    const easterEggModal = getEl('easter-egg-modal');
-
-    const setButtonsDisabled = (disabled) => {
-      uploadLabel.disabled = disabled;
-      resetBtn.disabled = disabled;
+    // --- Curated Game List ---
+    // ROMs hosted on archive.org, known to be CORS-friendly.
+    const GAMES = {
+        snes: [
+            { name: "Super Metroid", url: "https://archive.org/download/super-metroid-snes/Super%20Metroid%20%28U%29%20%28V1.1%29.smc" },
+            { name: "The Legend of Zelda: A Link to the Past", url: "https://archive.org/download/legend-of-zelda-a-link-to-the-past-snes/Legend%20of%20Zelda%2C%20The%20-%20A%20Link%20to%20the%20Past%20%28U%29.smc" },
+            { name: "Super Mario World", url: "https://archive.org/download/super-mario-world-snes/Super%20Mario%20World%20%28U%29%20%5B%21%5D.smc" },
+            { name: "Chrono Trigger", url: "https://archive.org/download/chrono-trigger-snes/Chrono%20Trigger%20%28U%29.smc" },
+        ],
+        nes: [
+            { name: "Super Mario Bros. 3", url: "https://archive.org/download/super-mario-bros-3-nes/Super%20Mario%20Bros.%203%20%28U%29%20%28PRG1%29.nes" },
+            { name: "The Legend of Zelda", url: "https://archive.org/download/legend-of-zelda-nes/Legend%20of%20Zelda%2C%20The%20%28U%29%20%28PRG1%29.nes" },
+            { name: "Mega Man 2", url: "https://archive.org/download/mega-man-2-nes/Mega%20Man%202%20%28U%29.nes" },
+        ],
+        gba: [
+            { name: "Metroid Fusion", url: "https://archive.org/download/metroid-fusion-gba/Metroid%20Fusion%20%28U%29.gba" },
+            { name: "The Legend of Zelda: The Minish Cap", url: "https://archive.org/download/legend-of-zelda-the-minish-cap-gba/Legend%20of%20Zelda%2C%20The%20-%20The%20Minish%20Cap%20%28U%29.gba" },
+            { name: "Castlevania: Aria of Sorrow", url: "https://archive.org/download/castlevania-aria-of-sorrow-gba/Castlevania%20-%20Aria%20of%20Sorrow%20%28U%29.gba" },
+        ],
+        segaMD: [
+            { name: "Sonic the Hedgehog 2", url: "https://archive.org/download/sonic-the-hedgehog-2-sega-genesis/Sonic%20the%20Hedgehog%202%20%28U%29%20%28World%29.md" },
+            { name: "Streets of Rage 2", url: "https://archive.org/download/streets-of-rage-2-sega-genesis/Streets%20of%20Rage%202%20%28U%29.md" },
+        ],
+        psx: [
+             { name: "Castlevania: Symphony of the Night", url: "https://archive.org/download/sony-playstation-usa-psx-redump.org-2023-09-17/Castlevania%20-%20Symphony%20of%20the%20Night%20%28USA%29.chd" },
+             { name: "Crash Bandicoot", url: "https://archive.org/download/sony-playstation-usa-psx-redump.org-2023-09-17/Crash%20Bandicoot%20%28USA%29.chd" },
+        ]
     };
 
-    // --- Event Listeners ---
-    coreSelect.addEventListener('change', function () {
-      window.EJS_core = this.value;
-      statusDiv.textContent = `Console: ${this.options[this.selectedIndex].text}`;
-    });
-
-    uploadLabel.addEventListener('click', () => romUpload.click());
-
-    romUpload.addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      statusDiv.textContent = "Carregando ROM...";
-      loader.classList.remove('hidden');
-      setButtonsDisabled(true);
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        window.EJS_gameUrl = e.target.result;
-        romInfoDiv.textContent = "Jogo: " + file.name;
-        loadEmulator();
-      };
-      reader.onerror = function () {
-        statusDiv.textContent = "Erro ao ler a ROM.";
-        loader.classList.add('hidden');
-        setButtonsDisabled(false);
-      };
-      reader.readAsArrayBuffer(file);
-    });
+    // --- DOM Elements ---
+    const getEl = (id) => document.getElementById(id);
+    const UI = {
+        coreSelect: getEl('core-select'),
+        statusDiv: getEl('status'),
+        romInfoDiv: getEl('rom-info'),
+        gameContainer: getEl('game-container'),
+        loader: getEl('loader'),
+        gameModal: getEl('game-modal'),
+        modalTitle: getEl('modal-title'),
+        gameList: getEl('game-list'),
+        // Buttons
+        selectGameBtn: getEl('selectGameBtn'),
+        resetBtn: getEl('resetBtn'),
+        fullscreenBtn: getEl('fullscreenBtn'),
+        saveStateBtn: getEl('saveStateBtn'),
+        loadStateBtn: getEl('loadStateBtn'),
+        closeModalBtn: getEl('closeModalBtn'),
+    };
     
-    window.EJS_onGameStart = function() {
-        statusDiv.textContent = "Jogo iniciado!";
-        loader.classList.add('hidden');
-        setButtonsDisabled(false);
-    }
-    
-    function loadEmulator() {
+    // --- UI Update Functions ---
+    const updateStatus = (message, isError = false) => {
+        UI.statusDiv.textContent = message;
+        UI.statusDiv.classList.toggle('status-error', isError);
+    };
+
+    const setButtonsDisabled = (state) => {
+        UI.resetBtn.disabled = !state;
+        UI.saveStateBtn.disabled = !state;
+        UI.loadStateBtn.disabled = !state;
+        UI.selectGameBtn.disabled = state;
+        UI.coreSelect.disabled = state;
+    };
+
+    const showLoader = (visible) => {
+        UI.loader.classList.toggle('hidden', !visible);
+    };
+
+    const toggleGameModal = (show) => {
+        if (show) {
+            const core = UI.coreSelect.value;
+            const coreName = UI.coreSelect.options[UI.coreSelect.selectedIndex].text;
+            UI.modalTitle.textContent = `Selecione um Jogo de ${coreName}`;
+            
+            const gamesForCore = GAMES[core] || [];
+            UI.gameList.innerHTML = ''; // Clear previous list
+
+            if (gamesForCore.length > 0) {
+                gamesForCore.forEach(game => {
+                    const li = document.createElement('li');
+                    li.textContent = game.name;
+                    li.dataset.url = game.url;
+                    li.addEventListener('click', () => {
+                        loadGame(game.name, game.url);
+                        toggleGameModal(false);
+                    });
+                    UI.gameList.appendChild(li);
+                });
+            } else {
+                UI.gameList.innerHTML = '<li>Nenhum jogo encontrado para este console.</li>';
+            }
+        }
+        UI.gameModal.classList.toggle('show', show);
+    };
+
+    // --- Emulator Logic ---
+    const loadGame = (name, url) => {
+        updateStatus(`Carregando ${name}...`);
+        showLoader(true);
+        setButtonsDisabled(true);
+
+        window.EJS_core = APP_STATE.currentCore;
+        window.EJS_gameUrl = url;
+        APP_STATE.currentGame = name;
+
+        // Clean up previous instance before loading a new one
         const oldScript = document.querySelector('script[src*="loader.js"]');
-        if(oldScript) oldScript.remove();
+        if (oldScript) oldScript.remove();
         getEl('game').innerHTML = '';
 
         const script = document.createElement('script');
         script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
         script.onerror = () => {
-          statusDiv.textContent = "Erro ao carregar o emulador.";
-          loader.classList.add('hidden');
-          setButtonsDisabled(false);
+            updateStatus("Erro ao carregar o script do emulador.", true);
+            showLoader(false);
+            setButtonsDisabled(false);
         };
         document.body.appendChild(script);
-    }
-
-    resetBtn.addEventListener('click', () => {
+    };
+    
+    const resetGame = () => {
+        if (!APP_STATE.isGameRunning) return;
+        
         const oldScript = document.querySelector('script[src*="loader.js"]');
         if (oldScript) oldScript.remove();
+        
         getEl('game').innerHTML = '';
-        romInfoDiv.textContent = '';
-        statusDiv.textContent = 'Selecione o console e carregue uma ROM para começar!';
-        romUpload.value = ''; // Reset file input
+        UI.romInfoDiv.textContent = '';
+        updateStatus('Selecione um console e escolha um jogo para começar!');
         setButtonsDisabled(false);
-    });
+        APP_STATE.isGameRunning = false;
+        APP_STATE.currentGame = '';
+    };
 
-    fullscreenBtn.addEventListener('click', function () {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        gameContainer.requestFullscreen().catch(err => {
-          console.error(`Erro ao ativar tela cheia: ${err.message}`);
-        });
-      }
-    });
+    // --- EmulatorJS Event Hooks ---
+    window.EJS_onGameStart = function() {
+        updateStatus(`${APP_STATE.currentGame} iniciado!`);
+        UI.romInfoDiv.textContent = `Jogando: ${APP_STATE.currentGame}`;
+        showLoader(false);
+        setButtonsDisabled(true);
+        APP_STATE.isGameRunning = true;
+    };
     
-    document.addEventListener('fullscreenchange', () => {
-        fullscreenBtn.innerHTML = document.fullscreenElement 
-            ? '<i class="fa-solid fa-compress"></i> Sair' 
-            : '<i class="fa-solid fa-expand"></i> Tela Cheia';
-    });
+    // --- Event Listeners ---
+    const setupEventListeners = () => {
+        UI.coreSelect.addEventListener('change', function() {
+            APP_STATE.currentCore = this.value;
+            // If a game is running, changing core does nothing until reset.
+            if (!APP_STATE.isGameRunning) {
+                const coreName = this.options[this.selectedIndex].text;
+                updateStatus(`Console ${coreName} selecionado. Escolha um jogo.`);
+            }
+        });
+        
+        UI.selectGameBtn.addEventListener('click', () => toggleGameModal(true));
+        UI.closeModalBtn.addEventListener('click', () => toggleGameModal(false));
+        UI.gameModal.addEventListener('click', (e) => {
+            if (e.target === UI.gameModal) toggleGameModal(false);
+        });
 
-    // Easter egg: Konami Code
-    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-    let konamiIndex = 0;
-    document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
-        konamiIndex++;
-        if (konamiIndex === konamiCode.length) {
-          activateEasterEgg();
-          konamiIndex = 0;
-        }
-      } else {
-        konamiIndex = 0;
-      }
-    });
+        UI.resetBtn.addEventListener('click', resetGame);
 
-    function activateEasterEgg() {
-      easterEggModal.classList.add('show');
-      setTimeout(() => {
-        easterEggModal.classList.remove('show');
-      }, 2500);
-    }
+        UI.fullscreenBtn.addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                UI.gameContainer.requestFullscreen().catch(err => {
+                    console.error(`Erro ao ativar tela cheia: ${err.message}`);
+                });
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFullscreen = !!document.fullscreenElement;
+            UI.fullscreenBtn.innerHTML = isFullscreen
+                ? '<i class="fa-solid fa-compress"></i> Sair'
+                : '<i class="fa-solid fa-expand"></i> Tela Cheia';
+        });
+        
+        UI.saveStateBtn.addEventListener('click', () => {
+            if(APP_STATE.isGameRunning) {
+                EJS_savestate();
+                updateStatus('Progresso salvo!');
+            }
+        });
+
+        UI.loadStateBtn.addEventListener('click', () => {
+            if(APP_STATE.isGameRunning) {
+                EJS_loadstate();
+                updateStatus('Progresso carregado!');
+            }
+        });
+
+        // Konami Code Easter Egg
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    document.body.style.filter = 'invert(1)';
+                    setTimeout(() => document.body.style.filter = '', 500);
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+    };
+    
+    // --- Initializer ---
+    document.addEventListener('DOMContentLoaded', () => {
+        UI.coreSelect.value = APP_STATE.currentCore;
+        setupEventListeners();
+    });
   </script>
 </body>
-
 </html>
-
