@@ -3,183 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gringo's Retro Arcade - Emulador Retrô</title>
+  <title>Gringo's Retro Arcade</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #BB86FC;
-      --secondary: #03DAC6;
-      --bg: #0a0a0a;
-      --surface: #1e1e1e;
-      --text: #ffffff;
-      --error: #CF6679;
-      --success: #4ade80;
+      --primary-color: #BB86FC;
+      --secondary-color: #03DAC6;
+      --background-color: #121212;
+      --surface-color: #1e1e1e;
+      --on-surface-color: #ffffff;
+      --error-color: #CF6679;
     }
 
-    * { box-sizing: border-box; }
-
-    @keyframes gradientShift {
+    @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    @keyframes pulse { 50% { opacity: 0.7; } }
-    @keyframes slideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes glow { 0%, 100% { box-shadow: 0 0 10px rgba(187, 134, 252, 0.5); } 50% { box-shadow: 0 0 20px rgba(187, 134, 252, 0.8); } }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-    html, body {
-      width: 100%;
+    body, html {
       height: 100%;
       margin: 0;
       padding: 0;
-    }
-
-    body {
       font-family: 'Press Start 2P', cursive;
-      color: var(--text);
-      background: linear-gradient(-45deg, var(--bg), #1a1a2e, #2a1a2e, var(--bg));
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-      overflow: hidden;
+      color: var(--on-surface-color);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(-45deg, #121212, #1a1a2e, #2a1a2e, #121212);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
     }
 
-    .container {
-      width: 100%;
-      height: 100%;
-      max-width: 1600px;
-      padding: 12px;
+    #main-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-    }
-
-    /* ===== HEADER ===== */
-    header {
-      background: rgba(30, 30, 30, 0.95);
-      border: 3px solid var(--primary);
-      border-radius: 10px;
-      padding: 12px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 15px rgba(187, 134, 252, 0.3);
-      flex-shrink: 0;
-    }
-
-    header h1 {
-      margin: 0 0 8px 0;
-      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
-      color: var(--primary);
-      text-shadow: 2px 2px 0 var(--surface);
-      letter-spacing: 2px;
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
       align-items: center;
+      width: 90vw;
+      max-width: 1400px;
+      height: 95vh;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-radius: 24px;
+      gap: 15px;
+      padding: 15px;
+      background: rgba(20, 20, 20, 0.7);
+      border: 3px solid var(--primary-color);
     }
 
-    select, input[type="file"] {
-      background: var(--surface);
-      color: var(--text);
-      border: 2px solid var(--primary);
-      padding: 6px 10px;
-      border-radius: 5px;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
-      cursor: pointer;
+    h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      color: var(--primary-color);
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 0 var(--surface-color), 6px 6px 0 rgba(0, 0, 0, 0.2);
+      text-align: center;
       transition: all 0.3s ease;
-    }
-
-    select:focus, input[type="file"]:focus {
-      outline: none;
-      box-shadow: 0 0 12px var(--secondary);
-      border-color: var(--secondary);
-    }
-
-    select:hover {
-      background: rgba(187, 134, 252, 0.2);
-    }
-
-    .btn-header {
-      background: var(--secondary);
-      color: var(--bg);
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
       cursor: pointer;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      box-shadow: 0 2px 8px rgba(3, 218, 198, 0.3);
     }
 
-    .btn-header:hover {
+    h1:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(3, 218, 198, 0.6);
     }
 
-    .btn-header:active {
-      transform: scale(0.95);
-    }
-
-    /* ===== MAIN CONTENT ===== */
-    .main-content {
+    /* Layout Grid */
+    .layout {
       display: grid;
       grid-template-columns: 1fr 280px;
-      gap: 12px;
+      gap: 15px;
       flex: 1;
+      width: 100%;
       min-height: 0;
-      overflow-y: auto;
     }
 
-    @media (max-width: 1024px) {
-      .main-content {
+    @media (max-width: 1100px) {
+      .layout {
         grid-template-columns: 1fr;
       }
-      .sidebar {
-        max-height: 250px !important;
-        order: 2;
-      }
     }
 
-    /* ===== EMULATOR SECTION ===== */
-    .emulator-box {
-      background: linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(20, 20, 20, 0.8) 100%);
-      border: 3px solid var(--primary);
-      border-radius: 10px;
-      padding: 12px;
+    /* Header Controls */
+    .header-section {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 8px 30px rgba(187, 134, 252, 0.25);
-      min-height: 0;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: space-between;
     }
 
+    #core-select {
+      background-color: var(--surface-color);
+      color: var(--on-surface-color);
+      border: 2px solid var(--primary-color);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #core-select:hover {
+      background: rgba(187, 134, 252, 0.2);
+      box-shadow: 0 0 15px var(--primary-color);
+    }
+
+    .header-btn {
+      background: var(--secondary-color);
+      color: var(--background-color);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 11px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px var(--secondary-color);
+    }
+
+    /* Game Container */
     #game-container {
       position: relative;
       width: 100%;
-      flex: 1;
-      min-height: 500px;
-      background: #000;
-      border: 2px solid var(--secondary);
-      border-radius: 8px;
+      height: 100%;
+      background-color: #000;
+      border-radius: 15px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       overflow: hidden;
-      box-shadow: inset 0 0 20px rgba(3, 218, 198, 0.1);
+      border: 3px solid var(--secondary-color);
+      box-shadow: inset 0 0 30px rgba(3, 218, 198, 0.15);
+      min-height: 450px;
     }
 
     #game-container::before {
@@ -193,174 +165,196 @@
       background-size: 100% 6px;
       z-index: 5;
       pointer-events: none;
-      opacity: 0.08;
+      opacity: 0.1;
     }
 
     #game {
       width: 100%;
       height: 100%;
+      background-color: #000;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
       position: relative;
       z-index: 1;
     }
 
-    .loader {
+    #loader {
       position: absolute;
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(187, 134, 252, 0.3);
-      border-top-color: var(--primary);
+      border: 8px solid rgba(187, 134, 252, 0.3);
+      border-top: 8px solid var(--primary-color);
       border-radius: 50%;
+      width: 60px;
+      height: 60px;
       animation: spin 1s linear infinite;
       z-index: 10;
-      box-shadow: 0 0 20px rgba(187, 134, 252, 0.5);
+      box-shadow: 0 0 25px var(--primary-color);
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
-    /* ===== CONTROLS ===== */
-    .controls {
+    /* Controls Section */
+    #controls {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--surface-color);
+      border-radius: 10px;
+      border: 3px solid var(--primary-color);
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
-      justify-content: flex-start;
+      justify-content: center;
+      gap: 12px;
     }
 
-    .btn {
-      padding: 8px 12px;
-      background: linear-gradient(135deg, var(--primary) 0%, #9966FF 100%);
-      color: var(--bg);
-      border: 2px solid var(--primary);
-      border-radius: 6px;
+    .control-btn {
       cursor: pointer;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--primary-color) 0%, #9966FF 100%);
+      color: var(--background-color);
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 12px;
       text-transform: uppercase;
+      letter-spacing: 1px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      transition: all 0.3s ease;
+      gap: 8px;
       box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
-      white-space: nowrap;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: bold;
     }
 
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(187, 134, 252, 0.5);
-      background: linear-gradient(135deg, var(--secondary) 0%, #00B8A0 100%);
-      border-color: var(--secondary);
+    .control-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #00B8A0 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(3, 218, 198, 0.5);
+      border-color: var(--secondary-color);
     }
 
-    .btn:active:not(:disabled) {
-      transform: translateY(0);
+    .control-btn:active:not(:disabled) {
+      transform: translateY(-1px);
     }
 
-    .btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .control-btn:disabled {
       background: linear-gradient(135deg, #555 0%, #333 100%);
+      cursor: not-allowed;
+      opacity: 0.5;
       box-shadow: none;
     }
 
-    .btn i { font-size: 11px; }
+    .control-btn i {
+      font-size: 14px;
+    }
 
-    .status-bar {
+    /* Status */
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--secondary-color);
+      text-align: center;
       padding: 10px;
       background: rgba(3, 218, 198, 0.15);
-      border: 2px solid var(--secondary);
-      border-radius: 6px;
-      color: var(--secondary);
-      font-size: 10px;
-      min-height: 36px;
+      border: 2px solid var(--secondary-color);
+      border-radius: 8px;
+      min-height: 40px;
       display: flex;
       align-items: center;
-      animation: pulse 2s ease-in-out infinite;
+      justify-content: center;
       line-height: 1.3;
     }
 
-    .status-bar.success {
-      border-color: var(--success);
-      color: var(--success);
+    #status.success {
+      color: #4ade80;
+      border-color: #4ade80;
       background: rgba(74, 222, 128, 0.15);
-      animation: none;
     }
 
-    .status-bar.error {
-      border-color: var(--error);
-      color: var(--error);
+    #status.error {
+      color: var(--error-color);
+      border-color: var(--error-color);
       background: rgba(207, 102, 121, 0.15);
-      animation: none;
     }
 
-    /* ===== SIDEBAR: RECOMMENDED GAMES ===== */
+    /* Sidebar - Recommended Games */
     .sidebar {
-      background: linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(20, 20, 20, 0.8) 100%);
-      border: 2px solid var(--primary);
-      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%);
+      border: 2px solid var(--primary-color);
+      border-radius: 12px;
       padding: 12px;
-      max-height: 600px;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      min-height: 0;
       box-shadow: 0 8px 30px rgba(187, 134, 252, 0.15);
     }
 
     .sidebar h2 {
-      margin: 0 0 10px 0;
+      margin: 0;
       font-size: 11px;
-      color: var(--secondary);
-      border-bottom: 2px solid var(--primary);
+      color: var(--secondary-color);
+      border-bottom: 2px solid var(--primary-color);
       padding-bottom: 8px;
       letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .games-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .game-item {
-      background: rgba(187, 134, 252, 0.12);
-      border: 1px solid rgba(187, 134, 252, 0.4);
-      border-radius: 5px;
-      padding: 8px;
+      background: rgba(187, 134, 252, 0.15);
+      border: 2px solid rgba(187, 134, 252, 0.4);
+      border-radius: 6px;
+      padding: 9px;
       cursor: pointer;
       transition: all 0.3s ease;
       font-size: 10px;
       word-break: break-word;
-      line-height: 1.3;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      line-height: 1.2;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
     }
 
     .game-item:hover {
-      background: var(--primary);
-      color: var(--bg);
-      transform: translateX(4px);
-      border-color: var(--secondary);
-      box-shadow: 0 4px 12px rgba(187, 134, 252, 0.4);
+      background: var(--primary-color);
+      color: var(--background-color);
+      transform: translateX(5px);
+      border-color: var(--secondary-color);
+      box-shadow: 0 4px 15px rgba(187, 134, 252, 0.5);
     }
 
     .game-item.active {
-      background: var(--secondary);
-      color: var(--bg);
-      border-color: var(--secondary);
-      box-shadow: 0 4px 12px rgba(3, 218, 198, 0.4);
+      background: var(--secondary-color);
+      color: var(--background-color);
+      border-color: var(--secondary-color);
+      box-shadow: 0 4px 15px rgba(3, 218, 198, 0.5);
     }
 
     .game-console {
-      font-size: 8px;
+      font-size: 9px;
       opacity: 0.8;
       margin-top: 3px;
+      color: var(--secondary-color);
     }
 
-    /* ===== TUTORIAL MODAL ===== */
+    /* Tutorial Modal */
     #tutorial-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.96);
+      background: rgba(0, 0, 0, 0.95);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -377,16 +371,15 @@
     }
 
     .modal-box {
-      background: var(--surface);
-      border: 3px solid var(--primary);
-      border-radius: 10px;
-      padding: 18px;
+      background: var(--surface-color);
+      border: 3px solid var(--primary-color);
+      border-radius: 12px;
+      padding: 20px;
       max-width: 550px;
-      width: 92%;
+      width: 90%;
       max-height: 85vh;
       overflow-y: auto;
       box-shadow: 0 20px 60px rgba(187, 134, 252, 0.4);
-      animation: fadeIn 0.3s ease-out;
     }
 
     .modal-header {
@@ -394,33 +387,28 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
-      border-bottom: 2px solid var(--primary);
+      border-bottom: 2px solid var(--primary-color);
       padding-bottom: 10px;
     }
 
     .modal-header h2 {
       margin: 0;
-      font-size: 12px;
-      color: var(--primary);
+      font-size: 13px;
+      color: var(--primary-color);
       letter-spacing: 1px;
     }
 
     .close-btn {
       background: none;
       border: none;
-      color: var(--text);
-      font-size: 24px;
+      color: var(--on-surface-color);
+      font-size: 28px;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
     }
 
     .close-btn:hover {
-      color: var(--secondary);
+      color: var(--secondary-color);
       transform: rotate(90deg);
     }
 
@@ -428,259 +416,212 @@
       margin-bottom: 12px;
       padding: 10px;
       background: rgba(187, 134, 252, 0.1);
-      border-left: 3px solid var(--secondary);
+      border-left: 3px solid var(--secondary-color);
       border-radius: 5px;
     }
 
     .step h3 {
       margin: 0 0 6px 0;
-      font-size: 9px;
-      color: var(--secondary);
+      font-size: 10px;
+      color: var(--secondary-color);
       letter-spacing: 0.5px;
     }
 
     .step p {
       margin: 0;
-      font-size: 8px;
-      color: var(--text);
+      font-size: 9px;
+      color: var(--on-surface-color);
       line-height: 1.4;
     }
 
-    .step code {
-      background: rgba(3, 218, 198, 0.2);
-      padding: 2px 4px;
-      border-radius: 3px;
-      color: var(--secondary);
-      font-size: 8px;
-    }
-
-    /* ===== SCROLLBAR ===== */
+    /* Scrollbar */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
 
     ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.3);
       border-radius: 10px;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--primary);
+      background: var(--primary-color);
       border-radius: 10px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: var(--secondary);
+      background: var(--secondary-color);
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .container {
-        padding: 8px;
-        gap: 8px;
-      }
-
-      header {
-        padding: 8px;
-      }
-
-      header h1 {
-        font-size: 1rem;
-        margin-bottom: 6px;
-      }
-
-      .header-controls {
-        gap: 6px;
-      }
-
-      .main-content {
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .layout {
         grid-template-columns: 1fr;
-      }
-
-      .emulator-box {
-        padding: 8px;
-        gap: 8px;
-      }
-
-      #game-container {
-        min-height: 400px;
-      }
-
-      .controls {
-        gap: 6px;
-      }
-
-      .btn {
-        padding: 6px 10px;
-        font-size: 9px;
       }
 
       .sidebar {
         max-height: 250px;
-        padding: 10px;
-      }
-
-      .modal-box {
-        width: 95%;
-        padding: 15px;
-      }
-
-      .modal-header h2 {
-        font-size: 11px;
-      }
-
-      .step {
-        padding: 8px;
-        margin-bottom: 10px;
-      }
-
-      .step h3 {
-        font-size: 8px;
-      }
-
-      .step p {
-        font-size: 7px;
       }
     }
 
-    @media (max-width: 480px) {
-      header h1 {
-        font-size: 0.9rem;
+    @media (max-width: 768px) {
+      #main-container {
+        width: 95vw;
+        padding: 10px;
+        gap: 10px;
       }
 
-      .header-controls {
-        flex-direction: column;
-        width: 100%;
+      h1 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
       }
 
-      select, input[type="file"], .btn-header {
-        width: 100%;
+      .header-section {
+        gap: 8px;
       }
 
-      #game-container {
-        min-height: 300px;
+      #core-select, .header-btn {
+        font-size: 10px;
+        padding: 6px 10px;
       }
 
-      .controls {
-        justify-content: space-between;
+      #controls {
+        gap: 8px;
+        padding: 10px;
       }
 
-      .btn {
-        flex: 1;
-        min-width: 0;
-        padding: 6px 8px;
-        font-size: 8px;
+      .control-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+        gap: 4px;
       }
 
-      .btn span {
-        display: none;
+      .control-btn i {
+        font-size: 12px;
+      }
+
+      .game-item {
+        padding: 8px;
+        font-size: 9px;
+      }
+
+      .modal-box {
+        padding: 15px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- HEADER -->
-    <header>
-      <h1>🎮 Gringo's Retro Arcade</h1>
-      <div class="header-controls">
-        <select id="console-select">
-          <option value="nes">🔴 NES</option>
-          <option value="snes">🟣 SNES</option>
-          <option value="gba">🟢 GBA</option>
-          <option value="genesis">🔵 Genesis</option>
-        </select>
-        <input type="file" id="rom-upload" accept=".nes,.smc,.gba,.md,.bin,.iso,.chd">
-        <button class="btn-header" id="help-btn">
-          <i class="fas fa-question-circle"></i><span> Ajuda</span>
-        </button>
-      </div>
-    </header>
+  <div id="main-container">
+    <h1>Gringo's Retro Arcade</h1>
 
-    <!-- MAIN LAYOUT -->
-    <div class="main-content">
-      <!-- EMULATOR -->
-      <div class="emulator-box">
+    <div class="header-section">
+      <select id="core-select" title="Selecione um console">
+        <option value="nes">NES</option>
+        <option value="snes">SNES</option>
+        <option value="gb">Game Boy</option>
+        <option value="gbc">Game Boy Color</option>
+        <option value="gba">Game Boy Advance</option>
+        <option value="vb">Virtual Boy</option>
+        <option value="n64">Nintendo 64</option>
+        <option value="nds">Nintendo DS</option>
+        <option value="segaMS">Sega Master System</option>
+        <option value="segaMD">Sega Mega Drive</option>
+        <option value="segaCD">Sega CD</option>
+        <option value="segaGG">Sega Game Gear</option>
+        <option value="sega32x">Sega 32X</option>
+        <option value="segaSaturn">Sega Saturn</option>
+        <option value="psx">PlayStation</option>
+        <option value="atari2600">Atari 2600</option>
+        <option value="atari7800">Atari 7800</option>
+        <option value="lynx">Atari Lynx</option>
+        <option value="pce">PC Engine/TurboGrafx-16</option>
+        <option value="ws">WonderSwan</option>
+        <option value="ngp">Neo Geo Pocket</option>
+      </select>
+      <button class="header-btn" id="help-btn">
+        <i class="fas fa-question-circle"></i> Ajuda
+      </button>
+    </div>
+
+    <div class="layout">
+      <!-- Game Area -->
+      <div style="display: flex; flex-direction: column; gap: 10px; min-height: 0;">
         <div id="game-container">
-          <div class="loader hidden" id="loader"></div>
+          <div id="loader" class="hidden"></div>
           <div id="game"></div>
         </div>
 
-        <div class="controls">
-          <button class="btn" id="btn-play" title="Clique para carregar uma ROM">
-            <i class="fas fa-play"></i><span>Carregar</span>
+        <div id="controls">
+          <button id="uploadLabel" class="control-btn">
+            <i class="fas fa-upload"></i> Carregar ROM
           </button>
-          <button class="btn" id="btn-reset" disabled title="Reinicia o jogo atual">
-            <i class="fas fa-redo"></i><span>Reiniciar</span>
+          <button id="resetBtn" class="control-btn" disabled>
+            <i class="fas fa-redo"></i> Reiniciar
           </button>
-          <button class="btn" id="btn-save" disabled title="Salva seu progresso">
-            <i class="fas fa-save"></i><span>Salvar</span>
+          <button id="saveBtn" class="control-btn" disabled>
+            <i class="fas fa-save"></i> Salvar
           </button>
-          <button class="btn" id="btn-load" disabled title="Carrega seu progresso">
-            <i class="fas fa-folder-open"></i><span>Carregar</span>
+          <button id="loadBtn" class="control-btn" disabled>
+            <i class="fas fa-folder-open"></i> Carregar
           </button>
-          <button class="btn" id="btn-fullscreen" title="Ativa tela cheia">
-            <i class="fas fa-expand"></i><span>Tela Cheia</span>
+          <button id="fullscreenBtn" class="control-btn">
+            <i class="fas fa-expand"></i> Tela Cheia
           </button>
         </div>
 
-        <div class="status-bar" id="status">
-          ⏸️ Pronto! Selecione um console e escolha um jogo da lista.
-        </div>
+        <div id="status">Selecione o console e carregue uma ROM para começar!</div>
       </div>
 
-      <!-- SIDEBAR: RECOMMENDED GAMES -->
+      <!-- Sidebar -->
       <div class="sidebar">
-        <h2>⭐ RECOMENDADOS</h2>
+        <h2><i class="fas fa-star"></i> Recomendados</h2>
         <div class="games-list" id="games-list"></div>
       </div>
     </div>
   </div>
 
-  <!-- TUTORIAL MODAL -->
+  <!-- Tutorial Modal -->
   <div id="tutorial-modal">
     <div class="modal-box">
       <div class="modal-header">
-        <h2>🎮 Como Usar</h2>
-        <button class="close-btn" id="close-modal" title="Fechar">×</button>
+        <h2>Como Usar</h2>
+        <button class="close-btn" id="close-modal">×</button>
       </div>
 
       <div class="step">
-        <h3>1️⃣ SELECIONE UM CONSOLE</h3>
-        <p>No topo, escolha entre NES, SNES, GBA ou Sega Genesis.</p>
+        <h3>1 - SELECIONE UM CONSOLE</h3>
+        <p>Use o dropdown no topo para escolher NES, SNES, GBA, Genesis, PlayStation ou outro console.</p>
       </div>
 
       <div class="step">
-        <h3>2️⃣ ESCOLHA UM JOGO</h3>
-        <p>Clique em um jogo recomendado à direita ou faça upload de sua própria ROM.</p>
+        <h3>2 - ESCOLHA UM JOGO</h3>
+        <p>Clique em um dos jogos recomendados na lista lateral ou carregue sua própria ROM.</p>
       </div>
 
       <div class="step">
-        <h3>3️⃣ CONTROLES DO TECLADO</h3>
-        <p><code>↑ ↓ ← →</code> Movimento | <code>Z</code> Botão A | <code>X</code> Botão B | <code>A</code> L | <code>S</code> R</p>
+        <h3>3 - CONTROLES</h3>
+        <p>Setas: Movimento | Z: Botão A | X: Botão B | A: L | S: R</p>
       </div>
 
       <div class="step">
-        <h3>4️⃣ SALVE O PROGRESSO</h3>
+        <h3>4 - SALVE SEU PROGRESSO</h3>
         <p>Use "Salvar" durante o jogo e "Carregar" para continuar depois.</p>
       </div>
 
       <div class="step">
-        <h3>5️⃣ TELA CHEIA</h3>
-        <p>Clique em "Tela Cheia" para uma experiência completa de arcade.</p>
-      </div>
-
-      <div class="step">
-        <h3>🎯 EASTER EGG</h3>
-        <p>Digite o código Konami: <code>↑ ↑ ↓ ↓ ← → ← → B A</code> para uma surpresa!</p>
+        <h3>5 - EASTER EGG</h3>
+        <p>Digite o código Konami: ↑ ↑ ↓ ↓ ← → ← → B A</p>
       </div>
     </div>
   </div>
 
+  <input type="file" id="romUpload" style="display: none;" accept=".nes,.smc,.gba,.md,.bin,.iso,.chd">
+
   <script>
-    // ===== JOGOS VALIDADOS (100% FUNCIONAM) =====
-    const GAMES = {
+    // Games Database
+    const GAMES_DB = {
       nes: [
         { name: 'Super Mario Bros.', url: 'https://archive.org/download/super-mario-bros-nes/Super%20Mario%20Bros.%20%28U%29%20%5B%21%5D.nes' },
         { name: 'The Legend of Zelda', url: 'https://archive.org/download/legend-of-zelda-nes/Legend%20of%20Zelda%2C%20The%20%28U%29%20%28PRG1%29.nes' },
@@ -694,60 +635,56 @@
       gba: [
         { name: 'Kirby Amazing Mirror', url: 'https://archive.org/download/kirby-amazing-mirror-gba/Kirby%20%26%20The%20Amazing%20Mirror%20%28U%29.gba' }
       ],
-      genesis: [
+      segaMD: [
         { name: 'Sonic the Hedgehog', url: 'https://archive.org/download/sonic-the-hedgehog-sega-genesis/Sonic%20the%20Hedgehog%20%28U%29%20%28REV00%29%20%28World%29.md' },
         { name: 'Sonic 2', url: 'https://archive.org/download/sonic-the-hedgehog-2-sega-genesis/Sonic%20the%20Hedgehog%202%20%28U%29%20%28World%29.md' }
       ]
     };
 
-    // ===== DOM ELEMENTS =====
-    const DOM = {
-      gameDiv: document.getElementById('game'),
-      loader: document.getElementById('loader'),
-      status: document.getElementById('status'),
-      consoleSelect: document.getElementById('console-select'),
-      romUpload: document.getElementById('rom-upload'),
-      gamesList: document.getElementById('games-list'),
-      btnPlay: document.getElementById('btn-play'),
-      btnReset: document.getElementById('btn-reset'),
-      btnSave: document.getElementById('btn-save'),
-      btnLoad: document.getElementById('btn-load'),
-      btnFullscreen: document.getElementById('btn-fullscreen'),
-      gameContainer: document.getElementById('game-container'),
-      helpBtn: document.getElementById('help-btn'),
-      tutorialModal: document.getElementById('tutorial-modal'),
-      closeModal: document.getElementById('close-modal')
-    };
+    // DOM Elements
+    const getEl = (id) => document.getElementById(id);
+    const coreSelect = getEl('core-select');
+    const uploadLabel = getEl('uploadLabel');
+    const romUpload = getEl('romUpload');
+    const statusDiv = getEl('status');
+    const fullscreenBtn = getEl('fullscreenBtn');
+    const resetBtn = getEl('resetBtn');
+    const saveBtn = getEl('saveBtn');
+    const loadBtn = getEl('loadBtn');
+    const gameContainer = getEl('game-container');
+    const loader = getEl('loader');
+    const gamesList = getEl('games-list');
+    const tutorialModal = getEl('tutorial-modal');
+    const helpBtn = getEl('help-btn');
+    const closeModal = getEl('close-modal');
 
-    // ===== STATE =====
     let currentGame = null;
     let isRunning = false;
-    let currentConsole = 'nes';
 
-    // ===== UTILITY FUNCTIONS =====
+    // Utility Functions
     const setStatus = (msg, type = '') => {
-      DOM.status.textContent = msg;
-      DOM.status.className = `status-bar ${type}`;
+      statusDiv.textContent = msg;
+      statusDiv.className = `${type}`;
     };
 
-    const setControlsEnabled = (enabled) => {
-      DOM.btnReset.disabled = !enabled;
-      DOM.btnSave.disabled = !enabled;
-      DOM.btnLoad.disabled = !enabled;
+    const setButtonsDisabled = (disabled) => {
+      uploadLabel.disabled = disabled;
+      resetBtn.disabled = !isRunning;
+      saveBtn.disabled = !isRunning;
+      loadBtn.disabled = !isRunning;
     };
 
     const showLoader = (visible) => {
-      DOM.loader.classList.toggle('hidden', !visible);
+      loader.classList.toggle('hidden', !visible);
     };
 
     const renderGamesList = () => {
-      const console = DOM.consoleSelect.value;
-      currentConsole = console;
-      const games = GAMES[console] || [];
-      DOM.gamesList.innerHTML = '';
+      const console = coreSelect.value;
+      const games = GAMES_DB[console] || [];
+      gamesList.innerHTML = '';
 
       if (games.length === 0) {
-        DOM.gamesList.innerHTML = '<div class="game-item" style="text-align: center; color: var(--secondary);">Nenhum jogo disponível</div>';
+        gamesList.innerHTML = '<div class="game-item" style="text-align: center; opacity: 0.5;">Nenhum jogo</div>';
         return;
       }
 
@@ -756,243 +693,162 @@
         div.className = 'game-item';
         div.innerHTML = `<strong>${game.name}</strong><div class="game-console">${console.toUpperCase()}</div>`;
         div.addEventListener('click', () => loadGame(game));
-        DOM.gamesList.appendChild(div);
+        gamesList.appendChild(div);
       });
     };
 
-    // ===== EMULATOR CONFIG =====
+    // Emulator Config
     window.EJS_player = '#game';
+    window.EJS_core = 'nes';
+    window.EJS_gameName = 'Gringo Retro Arcade';
+    window.EJS_color = '#BB86FC';
     window.EJS_startOnLoaded = true;
     window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
 
     window.EJS_onGameStart = () => {
-      const gameName = currentGame ? currentGame.split('/').pop().split('.')[0] : 'Jogo';
-      setStatus(`▶️ ${gameName} iniciado com sucesso!`, 'success');
-      setControlsEnabled(true);
+      setStatus(`▶️ ${currentGame} iniciado!`, 'success');
       isRunning = true;
+      setButtonsDisabled(false);
       showLoader(false);
     };
 
-    window.EJS_onError = () => {
-      setStatus('❌ Erro ao carregar. Tente outro jogo.', 'error');
-      showLoader(false);
-      isRunning = false;
-      setControlsEnabled(false);
-    };
-
-    // ===== LOAD GAME =====
+    // Load Game
     const loadGame = (game) => {
       try {
         currentGame = game.name;
-        const console = DOM.consoleSelect.value;
-        setStatus(`⏳ Carregando ${game.name}...`);
-        showLoader(true);
-        setControlsEnabled(false);
-
-        window.EJS_core = console;
+        window.EJS_core = coreSelect.value;
         window.EJS_gameUrl = game.url;
         window.EJS_gameName = game.name;
 
+        setStatus(`⏳ Carregando ${game.name}...`);
+        showLoader(true);
+        setButtonsDisabled(true);
+
         const oldScript = document.querySelector('script[src*="loader.js"]');
-        if (oldScript) {
-          oldScript.remove();
-        }
-        DOM.gameDiv.innerHTML = '';
+        if (oldScript) oldScript.remove();
+        getEl('game').innerHTML = '';
 
         const script = document.createElement('script');
         script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
-        script.async = true;
         script.onerror = () => {
-          setStatus('❌ Erro ao carregar emulador. Tente novamente.', 'error');
+          setStatus('❌ Erro ao carregar jogo.', 'error');
           showLoader(false);
-          isRunning = false;
+          setButtonsDisabled(false);
         };
         document.body.appendChild(script);
       } catch (e) {
-        console.error('Erro ao carregar jogo:', e);
-        setStatus('❌ Erro inesperado. Verifique o console.', 'error');
+        console.error('Erro:', e);
+        setStatus('❌ Erro ao carregar.', 'error');
         showLoader(false);
       }
     };
 
-    // ===== EVENT LISTENERS =====
-    DOM.consoleSelect.addEventListener('change', renderGamesList);
-
-    DOM.btnPlay.addEventListener('click', () => {
-      DOM.romUpload.click();
+    // Event Listeners
+    coreSelect.addEventListener('change', () => {
+      renderGamesList();
+      setStatus(`Console: ${coreSelect.options[coreSelect.selectedIndex].text}`);
     });
 
-    DOM.romUpload.addEventListener('change', (e) => {
-      try {
-        const file = e.target.files[0];
-        if (!file) return;
+    uploadLabel.addEventListener('click', () => romUpload.click());
 
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          try {
-            const gameName = file.name.replace(/\.[^.]*$/, '');
-            setStatus(`⏳ Carregando ${gameName}...`);
-            showLoader(true);
-            setControlsEnabled(false);
+    romUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-            const console = DOM.consoleSelect.value;
-            window.EJS_core = console;
-            window.EJS_gameUrl = evt.target.result;
-            window.EJS_gameName = gameName;
-            currentGame = gameName;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        loadGame({ name: file.name, url: evt.target.result });
+      };
+      reader.onerror = () => {
+        setStatus('❌ Erro ao ler arquivo.', 'error');
+      };
+      reader.readAsArrayBuffer(file);
+    });
 
-            const oldScript = document.querySelector('script[src*="loader.js"]');
-            if (oldScript) oldScript.remove();
-            DOM.gameDiv.innerHTML = '';
+    resetBtn.addEventListener('click', () => {
+      const oldScript = document.querySelector('script[src*="loader.js"]');
+      if (oldScript) oldScript.remove();
+      getEl('game').innerHTML = '';
+      setStatus('🔄 Jogo reiniciado!', 'success');
+      isRunning = false;
+      setButtonsDisabled(true);
+    });
 
-            const script = document.createElement('script');
-            script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
-            script.async = true;
-            script.onerror = () => {
-              setStatus('❌ Erro ao carregar ROM. Arquivo inválido?', 'error');
-              showLoader(false);
-            };
-            document.body.appendChild(script);
-          } catch (e) {
-            console.error('Erro ao processar ROM:', e);
-            setStatus('❌ Erro ao processar arquivo.', 'error');
-            showLoader(false);
-          }
-        };
-        reader.onerror = () => {
-          setStatus('❌ Erro ao ler arquivo!', 'error');
-        };
-        reader.readAsArrayBuffer(file);
-      } catch (e) {
-        console.error('Erro no upload:', e);
-        setStatus('❌ Erro no upload.', 'error');
+    saveBtn.addEventListener('click', () => {
+      if (isRunning && typeof EJS_savestate === 'function') {
+        EJS_savestate();
+        setStatus('💾 Jogo salvo!', 'success');
       }
     });
 
-    DOM.btnReset.addEventListener('click', () => {
-      try {
-        const oldScript = document.querySelector('script[src*="loader.js"]');
-        if (oldScript) oldScript.remove();
-        DOM.gameDiv.innerHTML = '';
-        setStatus('🔄 Jogo reiniciado!', 'success');
-        isRunning = false;
-        setControlsEnabled(false);
-      } catch (e) {
-        console.error('Erro ao reiniciar:', e);
+    loadBtn.addEventListener('click', () => {
+      if (isRunning && typeof EJS_loadstate === 'function') {
+        EJS_loadstate();
+        setStatus('📂 Jogo carregado!', 'success');
       }
     });
 
-    DOM.btnSave.addEventListener('click', () => {
-      try {
-        if (isRunning && typeof EJS_savestate === 'function') {
-          EJS_savestate();
-          setStatus('💾 Jogo salvo com sucesso!', 'success');
-        }
-      } catch (e) {
-        console.error('Erro ao salvar:', e);
-        setStatus('❌ Erro ao salvar.', 'error');
-      }
-    });
-
-    DOM.btnLoad.addEventListener('click', () => {
-      try {
-        if (isRunning && typeof EJS_loadstate === 'function') {
-          EJS_loadstate();
-          setStatus('📂 Jogo carregado com sucesso!', 'success');
-        }
-      } catch (e) {
-        console.error('Erro ao carregar:', e);
-        setStatus('❌ Erro ao carregar.', 'error');
-      }
-    });
-
-    DOM.btnFullscreen.addEventListener('click', () => {
-      try {
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        } else {
-          DOM.gameContainer.requestFullscreen().catch(err => {
-            console.error('Erro fullscreen:', err);
-            setStatus('⚠️ Fullscreen não disponível.', 'error');
-          });
-        }
-      } catch (e) {
-        console.error('Erro ao alternar fullscreen:', e);
+    fullscreenBtn.addEventListener('click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        gameContainer.requestFullscreen().catch(console.error);
       }
     });
 
     document.addEventListener('fullscreenchange', () => {
-      try {
-        const isFS = !!document.fullscreenElement;
-        DOM.btnFullscreen.innerHTML = isFS 
-          ? '<i class="fas fa-compress"></i><span>Sair FS</span>' 
-          : '<i class="fas fa-expand"></i><span>Tela Cheia</span>';
-      } catch (e) {
-        console.error('Erro ao atualizar fullscreen:', e);
+      fullscreenBtn.innerHTML = document.fullscreenElement
+        ? '<i class="fas fa-compress"></i> Sair'
+        : '<i class="fas fa-expand"></i> Tela Cheia';
+    });
+
+    helpBtn.addEventListener('click', () => {
+      tutorialModal.classList.add('show');
+    });
+
+    closeModal.addEventListener('click', () => {
+      tutorialModal.classList.remove('show');
+    });
+
+    tutorialModal.addEventListener('click', (e) => {
+      if (e.target === tutorialModal) {
+        tutorialModal.classList.remove('show');
       }
     });
 
-    DOM.helpBtn.addEventListener('click', () => {
-      DOM.tutorialModal.classList.add('show');
-    });
-
-    DOM.closeModal.addEventListener('click', () => {
-      DOM.tutorialModal.classList.remove('show');
-    });
-
-    DOM.tutorialModal.addEventListener('click', (e) => {
-      if (e.target === DOM.tutorialModal) {
-        DOM.tutorialModal.classList.remove('show');
-      }
-    });
-
-    // ===== EASTER EGG: KONAMI CODE =====
-    const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-    let konamiIdx = 0;
+    // Konami Code
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIndex = 0;
 
     document.addEventListener('keydown', (e) => {
-      try {
-        if (e.key.toLowerCase() === konami[konamiIdx].toLowerCase()) {
-          konamiIdx++;
-          if (konamiIdx === konami.length) {
-            document.body.style.filter = 'invert(1) hue-rotate(180deg)';
-            setTimeout(() => {
-              document.body.style.filter = '';
-            }, 400);
-            setStatus('🎮 CÓDIGO KONAMI ATIVADO! Você é um veterano!', 'success');
-            konamiIdx = 0;
-          }
-        } else {
-          konamiIdx = 0;
-        }
-      } catch (e) {
-        console.error('Erro no Konami:', e);
-      }
-    });
-
-    // ===== INITIALIZATION =====
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        renderGamesList();
-        setStatus('⏸️ Pronto! Selecione um console e escolha um jogo.', '');
-      } catch (e) {
-        console.error('Erro na inicialização:', e);
-        setStatus('❌ Erro ao inicializar.', 'error');
-      }
-    });
-
-    // Auto-show tutorial on first visit
-    window.addEventListener('load', () => {
-      try {
-        const hasVisited = localStorage.getItem('gringo-arcade-visited');
-        if (!hasVisited) {
+      if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          document.body.style.filter = 'invert(1) hue-rotate(180deg)';
           setTimeout(() => {
-            DOM.tutorialModal.classList.add('show');
-            localStorage.setItem('gringo-arcade-visited', 'true');
-          }, 800);
+            document.body.style.filter = '';
+          }, 400);
+          setStatus('🎮 CÓDIGO KONAMI ATIVADO!', 'success');
+          konamiIndex = 0;
         }
-      } catch (e) {
-        console.warn('localStorage não disponível:', e);
+      } else {
+        konamiIndex = 0;
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderGamesList();
+      setStatus('Selecione o console e carregue uma ROM para começar!');
+    });
+
+    window.addEventListener('load', () => {
+      const hasVisited = localStorage.getItem('gringo-arcade-visited');
+      if (!hasVisited) {
+        setTimeout(() => {
+          tutorialModal.classList.add('show');
+          localStorage.setItem('gringo-arcade-visited', 'true');
+        }, 800);
       }
     });
   </script>
