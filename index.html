@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gringo's Retro Arcade</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #BB86FC;
+      --secondary-color: #03DAC6;
+      --background-color: #121212;
+      --surface-color: #1e1e1e;
+      --on-surface-color: #ffffff;
+      --error-color: #CF6679;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Press Start 2P', cursive;
+      color: var(--on-surface-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(-45deg, #121212, #1a1a2e, #2a1a2e, #121212);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+    }
+
+    #main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90vw;
+      max-width: 1400px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-radius: 24px;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      max-height: 800px;
+      background-color: var(--surface-color);
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 4px solid var(--primary-color);
+      border-bottom: none;
+    }
+
+    #game {
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+    }
+
+    #loader {
+      position: absolute;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid var(--primary-color);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      z-index: 10;
+    }
+    .hidden { display: none; }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #controls {
+      width: 100%;
+      padding: 20px 0;
+      background-color: var(--surface-color);
+      border-radius: 0 0 20px 20px;
+      border: 4px solid var(--primary-color);
+      border-top: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .control-btn {
+      cursor: pointer;
+      padding: 12px 24px;
+      background-color: var(--primary-color);
+      color: var(--background-color);
+      border: none;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .control-btn:hover:not(:disabled) {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .control-btn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .control-btn i {
+      margin-right: 10px;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--secondary-color);
+      text-align: center;
+      height: 20px;
+      transition: color 0.3s ease;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      color: var(--primary-color);
+      text-transform: uppercase;
+      margin-bottom: 30px;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 0 var(--surface-color), 6px 6px 0 rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    #rom-info, #core-select {
+      position: absolute;
+      top: 20px;
+      z-index: 5;
+      background-color: rgba(0,0,0,0.6);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    #rom-info {
+      left: 20px;
+      color: var(--secondary-color);
+    }
+    #core-select {
+      right: 20px;
+      color: var(--on-surface-color);
+      border: 2px solid var(--primary-color);
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    #easter-egg-modal {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--primary-color);
+      color: var(--background-color);
+      padding: 15px 25px;
+      border-radius: 10px;
+      z-index: 100;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.5s ease, top 0.5s ease;
+    }
+    #easter-egg-modal.show {
+      top: 50px;
+      opacity: 1;
+    }
+
+    .pixelated {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 0.05em 0 0 var(--error-color), -0.05em -0.025em 0 var(--secondary-color), -0.025em 0.05em 0 var(--primary-color); }
+      15% { text-shadow: -0.05em -0.025em 0 var(--error-color), 0.025em 0.025em 0 var(--secondary-color), -0.05em -0.05em 0 var(--primary-color); }
+      50% { text-shadow: 0.025em 0.05em 0 var(--error-color), 0.05em 0 0 var(--secondary-color), 0 -0.05em 0 var(--primary-color); }
+      100% { text-shadow: -0.025em 0 0 var(--error-color), -0.025em -0.025em 0 var(--secondary-color), -0.025em -0.05em 0 var(--primary-color); }
+    }
+    h1:hover { animation: glitch 1s linear infinite; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div id="main-container">
+    <h1>Gringo Retro Arcade</h1>
+    <div id="game-container">
+      <div id="loader" class="hidden"></div>
+      <div id="game" class="pixelated"></div>
+      <div id="rom-info"></div>
+      <select id="core-select" title="Select a core">
+        <option value="nes">NES</option>
+        <option value="snes">SNES</option>
+        <option value="gb">Game Boy</option>
+        <option value="gbc">Game Boy Color</option>
+        <option value="gba">Game Boy Advance</option>
+        <option value="vb">Virtual Boy</option>
+        <option value="n64">Nintendo 64</option>
+        <option value="nds">Nintendo DS</option>
+        <option value="segaMS">Sega Master System</option>
+        <option value="segaMD">Sega Mega Drive</option>
+        <option value="segaCD">Sega CD</option>
+        <option value="segaGG">Sega Game Gear</option>
+        <option value="sega32x">Sega 32X</option>
+        <option value="segaSaturn">Sega Saturn</option>
+        <option value="psx">PlayStation</option>
+        <option value="atari2600">Atari 2600</option>
+        <option value="atari7800">Atari 7800</option>
+        <option value="lynx">Atari Lynx</option>
+        <option value="pce">PC Engine/TurboGrafx-16</option>
+        <option value="ws">WonderSwan</option>
+        <option value="ngp">Neo Geo Pocket</option>
+      </select>
+    </div>
+    <div id="controls">
+      <button id="uploadLabel" class="control-btn">
+        <i class="fa-solid fa-upload"></i> Carregar ROM
+      </button>
+       <button id="resetBtn" class="control-btn">
+        <i class="fa-solid fa-power-off"></i> Reiniciar
+      </button>
+      <button id="fullscreenBtn" class="control-btn">
+        <i class="fa-solid fa-expand"></i> Tela Cheia
+      </button>
+    </div>
+    <div id="status">Selecione o console e carregue uma ROM para começar!</div>
+  </div>
+  
+  <div id="easter-egg-modal">Código Konami Ativado!</div>
+  <input type="file" id="romUpload" style="display: none;">
+
+  <script>
+    // --- EmulatorJS Configuration ---
+    window.EJS_player = "#game";
+    window.EJS_core = "nes";
+    window.EJS_gameName = "Gringo Retro Arcade";
+    window.EJS_color = "#BB86FC";
+    window.EJS_startOnLoaded = true;
+    window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+
+    // --- DOM Elements ---
+    const getEl = (id) => document.getElementById(id);
+    const coreSelect = getEl('core-select');
+    const uploadLabel = getEl('uploadLabel');
+    const romUpload = getEl('romUpload');
+    const statusDiv = getEl('status');
+    const romInfoDiv = getEl('rom-info');
+    const fullscreenBtn = getEl('fullscreenBtn');
+    const resetBtn = getEl('resetBtn');
+    const gameContainer = getEl('game-container');
+    const loader = getEl('loader');
+    const easterEggModal = getEl('easter-egg-modal');
+
+    const setButtonsDisabled = (disabled) => {
+      uploadLabel.disabled = disabled;
+      resetBtn.disabled = disabled;
+    };
+
+    // --- Event Listeners ---
+    coreSelect.addEventListener('change', function () {
+      window.EJS_core = this.value;
+      statusDiv.textContent = `Console: ${this.options[this.selectedIndex].text}`;
+    });
+
+    uploadLabel.addEventListener('click', () => romUpload.click());
+
+    romUpload.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      statusDiv.textContent = "Carregando ROM...";
+      loader.classList.remove('hidden');
+      setButtonsDisabled(true);
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        window.EJS_gameUrl = e.target.result;
+        romInfoDiv.textContent = "Jogo: " + file.name;
+        loadEmulator();
+      };
+      reader.onerror = function () {
+        statusDiv.textContent = "Erro ao ler a ROM.";
+        loader.classList.add('hidden');
+        setButtonsDisabled(false);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    
+    window.EJS_onGameStart = function() {
+        statusDiv.textContent = "Jogo iniciado!";
+        loader.classList.add('hidden');
+        setButtonsDisabled(false);
+    }
+    
+    function loadEmulator() {
+        const oldScript = document.querySelector('script[src*="loader.js"]');
+        if(oldScript) oldScript.remove();
+        getEl('game').innerHTML = '';
+
+        const script = document.createElement('script');
+        script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+        script.onerror = () => {
+          statusDiv.textContent = "Erro ao carregar o emulador.";
+          loader.classList.add('hidden');
+          setButtonsDisabled(false);
+        };
+        document.body.appendChild(script);
+    }
+
+    resetBtn.addEventListener('click', () => {
+        const oldScript = document.querySelector('script[src*="loader.js"]');
+        if (oldScript) oldScript.remove();
+        getEl('game').innerHTML = '';
+        romInfoDiv.textContent = '';
+        statusDiv.textContent = 'Selecione o console e carregue uma ROM para começar!';
+        romUpload.value = ''; // Reset file input
+        setButtonsDisabled(false);
+    });
+
+    fullscreenBtn.addEventListener('click', function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        gameContainer.requestFullscreen().catch(err => {
+          console.error(`Erro ao ativar tela cheia: ${err.message}`);
+        });
+      }
+    });
+    
+    document.addEventListener('fullscreenchange', () => {
+        fullscreenBtn.innerHTML = document.fullscreenElement 
+            ? '<i class="fa-solid fa-compress"></i> Sair' 
+            : '<i class="fa-solid fa-expand"></i> Tela Cheia';
+    });
+
+    // Easter egg: Konami Code
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIndex = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase()) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          activateEasterEgg();
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    });
+
+    function activateEasterEgg() {
+      easterEggModal.classList.add('show');
+      setTimeout(() => {
+        easterEggModal.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+
+</html>
+
